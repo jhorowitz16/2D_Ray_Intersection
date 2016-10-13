@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from ray import Ray
+from device import Device
 
 def exists_intersection(ray_a, ray_b):
     """return if the rays intersect"""
@@ -20,6 +21,7 @@ def find_intersection(ray_a, ray_b):
     """finds intersection assuming it exists (or return False)"""
 
     if not exists_intersection(ray_a, ray_b):
+        # deals with the case where the lines intersect, but rays don't
         return False
 
     # two equations, two unknowns
@@ -68,6 +70,25 @@ def test_intersection():
     ray_135_neg = Ray((-6, 0), 3*math.pi/4)
     no_inter = find_intersection(ray_45, ray_135_neg)
 
-test_intersection()
+
+def test_device_constructor():
+    """testing"""
+    
+    perf_zero = Device.perfect_device(0)
+    perf_zero_device = Device(perf_zero)
+
+    noisy_zero = Device.noisy_device(0, 10)
+    noisy_zero_device = Device(noisy_zero)
+
+    rotating = Device.rotating_device(0, 10)
+    rotating_device = Device(rotating)
+
+    while True:
+        x = perf_zero_device.simple_poll()
+        y = noisy_zero_device.simple_poll()
+        z = rotating_device.simple_poll()
+        import pdb; pdb.set_trace()
+
+test_device_constructor()
 
 
