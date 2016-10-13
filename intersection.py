@@ -1,26 +1,6 @@
 import math
 import numpy as np
-
-class Ray:
-
-    def __init__(self, origin=(0,0), angle=math.pi/2):
-        """Ray - origin, (polar) heading, and (x,y) representation"""
-        self.origin = origin
-        self.angle = angle
-        # use vectors of length of 1 for normalized printouts
-        self.direction = self.polar_to_cartesian(1, angle)
-
-    def polar_to_cartesian(self, r, theta):
-        """return tuple with x and y components of the vector"""
-        x = r * math.cos(theta)
-        y = r * math.sin(theta)
-        return (x, y)
-
-    def __str__(self):
-        """print with degrees for clarity"""
-        deg = round(math.degrees(self.angle), 2)
-        return str(self.origin) + " | " + str(deg)
-
+from ray import Ray
 
 def exists_intersection(ray_a, ray_b):
     """return if the rays intersect"""
@@ -34,6 +14,7 @@ def exists_intersection(ray_a, ray_b):
     uu = (dy * ray_b.direction[0] - dx * ray_b.direction[1]) / det
     vv = (dy * ray_a.direction[0] - dx * ray_a.direction[1]) / det
     return uu > 0 and vv > 0 
+
 
 def find_intersection(ray_a, ray_b):
     """finds intersection assuming it exists (or return False)"""
@@ -65,11 +46,13 @@ def find_intersection(ray_a, ray_b):
     # round and return a tuple
     return (round(inter[0], 3), round(inter[1], 3))
 
+
 def test_ray_constructor():
     """testing"""
     ray_up = Ray()
     ray_down = Ray((0, 0), 3*math.pi/2)
     ray_one_one = Ray((1, 1), math.pi)
+
 
 def test_intersection():
     """testing"""
@@ -84,6 +67,7 @@ def test_intersection():
 
     ray_135_neg = Ray((-6, 0), 3*math.pi/4)
     no_inter = find_intersection(ray_45, ray_135_neg)
-    import pdb; pdb.set_trace()
 
 test_intersection()
+
+
