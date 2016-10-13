@@ -18,8 +18,16 @@ class Ray:
 
     def __str__(self):
         """print with degrees for clarity"""
-        deg = round(math.degrees(self.angle), 2)
-        return str(self.origin) + " | " + str(deg)
+        deg = math.degrees(self.angle)
+        deg_txt = "{:3.1f}".format(deg) 
+        origin_txt = ("({:4.1f}".format(self.origin[0]) + ", "  
+            "{:4.1f}".format(self.origin[1]) + ")")
+
+        if deg < 10:
+            return origin_txt + " |   " + deg_txt 
+        if deg < 100:
+            return origin_txt + " |  " + deg_txt 
+        return origin_txt + " | " + deg_txt 
 
     def __repr__(self):
         """print with degrees for clarity"""

@@ -47,10 +47,14 @@ def find_intersection(ray_a, ray_b):
     inter = a_origin + soln[0] * a_vect
 
     # round and return a tuple - (rounding doesn't work for vals like 5.6)
+    def display(val):
+        if val >= 0:
+            return "+{:4.1f}".format(val)
+        else:
+            val *= -1
+            return "-{:4.1f}".format(val)
 
-    x = dec.Decimal(str(inter[0])).quantize(dec.Decimal('.001'))
-    y = dec.Decimal(str(inter[1])).quantize(dec.Decimal('.001'))
-    return (float(x), float(y))
+    return "(" + display(inter[0]) + ", " + display(inter[1]) + ")"
 
 
 def test_ray_constructor():
