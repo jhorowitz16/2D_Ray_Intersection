@@ -1,4 +1,5 @@
 import math
+import decimal as dec
 import numpy as np
 from ray import Ray
 from device import Device
@@ -45,8 +46,11 @@ def find_intersection(ray_a, ray_b):
     # use a1 and a2 to recreate the point
     inter = a_origin + soln[0] * a_vect
 
-    # round and return a tuple
-    return (round(inter[0], 3), round(inter[1], 3))
+    # round and return a tuple - (rounding doesn't work for vals like 5.6)
+
+    x = dec.Decimal(str(inter[0])).quantize(dec.Decimal('.001'))
+    y = dec.Decimal(str(inter[1])).quantize(dec.Decimal('.001'))
+    return (float(x), float(y))
 
 
 def test_ray_constructor():
@@ -89,6 +93,21 @@ def test_device_constructor():
         z = rotating_device.simple_poll()
         import pdb; pdb.set_trace()
 
-test_device_constructor()
+
+def test_gen_device_constructor():
+    """find intersections btw 0 and a rotating ray"""
+
+    noisy_zero = Device.gen_device(0, 10, 0)
+    noisy_zero_device = Device(noisy_zero)
+    
+    rotating = Device.gen_device(0, 10, 10)
+    rotating_device = Device(rotating)
+
+    while True:
+        y = noisy_zero_device.simple_poll()
+        z = rotating_device.simple_poll()
+        import pdb; pdb.set_trace()
+ 
+
 
 

@@ -1,3 +1,4 @@
+import math
 import random
 from ray import Ray
 
@@ -64,10 +65,12 @@ class Device:
             yield angle 
             # increment by speed, but wrap around after 360 degrees
             angle += speed
-            angle = angle % 360
+            angle = angle % (2 * math.pi)
 
-            
-
-
-    
-
+    def gen_device(init_angle=0, noise=0, speed=0):
+        """general device - give init, randomness, turn speed (+/-)"""
+        angle = init_angle
+        while True:
+            yield angle
+            angle += (speed + noise * (random.random() - 0.5))
+            angle = angle % (2 * math.pi) 
