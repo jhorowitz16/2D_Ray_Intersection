@@ -23,7 +23,7 @@ def find_intersection(ray_a, ray_b):
 
     if not exists_intersection(ray_a, ray_b):
         # deals with the case where the lines intersect, but rays don't
-        return False
+        return None 
 
     # two equations, two unknowns
     # solve for constants a1 and a2 
@@ -79,39 +79,68 @@ def test_intersection():
     no_inter = find_intersection(ray_45, ray_135_neg)
 
 
-def test_device_constructor():
-    """testing"""
-    
-    perf_zero = Device.perfect_device(0)
-    perf_zero_device = Device(perf_zero)
-
-    noisy_zero = Device.noisy_device(0, 10)
-    noisy_zero_device = Device(noisy_zero)
-
-    rotating = Device.rotating_device(0, 10)
-    rotating_device = Device(rotating)
-
+def device_test_one():
+    """check behavior of multiple devicing with same generator"""
+    device_one = Device(0, 0, .01)
+    device_two = Device(0, 0, -.01)
     while True:
-        x = perf_zero_device.simple_poll()
-        y = noisy_zero_device.simple_poll()
-        z = rotating_device.simple_poll()
+        y = device_one.simple_poll()
+        z = device_two.simple_poll()
         import pdb; pdb.set_trace()
 
 
-def test_gen_device_constructor():
-    """find intersections btw 0 and a rotating ray"""
+def device_test_two():
+    """one device polls twice as fast as the other"""
+    rotating_slow = Device(0, 0, 0.1, 0.5, "rotating_slow")
+    rotating_fast = Device(0, 0, 0.1, 1.0, "rotating_fast")
+    monitor_time_step = 1
+    time = 0
+    while time < 10:
+        ray_a = Ray((0, 0), rotating_slow.global_poll(time))
+        ray_b = Ray((-1, -1), rotating_fast.global_poll(time))
+        print(ray_a, ray_b)
+        time += monitor_time_step
 
-    noisy_zero = Device.gen_device(0, 10, 0)
-    noisy_zero_device = Device(noisy_zero)
-    
-    rotating = Device.gen_device(0, 10, 10)
-    rotating_device = Device(rotating)
 
-    while True:
-        y = noisy_zero_device.simple_poll()
-        z = rotating_device.simple_poll()
-        import pdb; pdb.set_trace()
- 
+def device_test_three():
+    """devices poll at very different rates (2 vs 3)"""
+    rotating_medium = Device(0, 0, 0.1, 2.0, "rotating_medium")
+    rotating_fast = Device(0, 0, 0.1, 3.0, "rotating_fast")
+    monitor_time_step = 1
+    time = 0
+    while time < 10:
+        ray_a = Ray((0, 0), rotating_medium.global_poll(time))
+        ray_b = Ray((-1, -1), rotating_fast.global_poll(time))
+        print(ray_a, ray_b)
+        time += monitor_time_step
 
+
+def device_test_four():
+    """same as last test, but slow monitor"""
+    rotating_medium = Device(0, 0, 0.01, 2.0, "rotating_medium")
+    rotating_fast = Device(0, 0, 0.01, 3.0, "rotating_fast")
+    monitor_time_step = 4.0 
+    time = 0
+    while time < 40:
+        ray_a = Ray((0, 0), rotating_medium.global_poll(time))
+        ray_b = Ray((-1, -1), rotating_fast.global_poll(time))
+        i = find_intersection(ray_a, ray_b)
+        print (ray_a, "|||", ray_b, "|||", i)
+        time += monitor_time_step
+
+
+def device_test_five():
+    """same as last test, but more realistic frequencies"""
+    rotating_medium = Device(0, 0, 0.01, 60.0, "rotating_medium")
+    rotating_fast = Device(0, 0, 0.01, 100.0, "rotating_fast")
+    monitor_time_step = 1 / 75.0  # 75 hertz monitor
+    time, count = 0, 0
+    while count < 60:
+        ray_a = Ray((0, 0), rotating_medium.global_poll(time))
+        ray_b = Ray((-1, -1), rotating_fast.global_poll(time))
+        i = find_intersection(ray_a, ray_b)
+        print (ray_a, "|||", ray_b, "|||", i)
+        time += monitor_time_step
+        count += 1
 
 

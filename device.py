@@ -15,18 +15,32 @@ class Device:
     model the polling of the actual measuring device.
     """
 
-    def __init__(self, generator=None, name="Default_Device", hz=1.0):
+    def __init__(
+            self, init_angle=0.0, noise=0.0, speed=0.0, hz=1.0, 
+            name="Default_Device"):
         """represent device with generator that yields angles"""
-        self.generator = generator
+        self.generator = self.gen_device(init_angle, noise, speed) 
         self.name = name
         self.hz = hz
         self.time_step = 1 / hz
         self.local_time = 0.0
+        # last_val is the last recorded angle (at time = local_time) 
+        self.last_val = init_angle
 
     def global_poll(self, time):
-        """give a global_time for seconds since device started"""
-        # TBD
-        return 0
+        """give a global_time for seconds since device started
+        
+        If time is in the past (before local_time) just return last_val,
+        that way the device doesn't need to have a full history of all
+        measured values.
+
+        Only poll the generator again if we need to.
+        """
+        while time >= self.local_time + self.time_step:
+            # need new data - update time and last_val
+            self.local_time += self.time_step
+            self.last_val = self.generator.__next__() 
+        return self.last_val 
 
     def simple_poll(self):
         """just return the next value, whatever that value is"""
@@ -62,15 +76,16 @@ class Device:
         """start at init_angle, and go speed (+/-) counterclockwise"""
         angle = init_angle 
         while True:
-            yield angle 
             # increment by speed, but wrap around after 360 degrees
             angle += speed
             angle = angle % (2 * math.pi)
+            yield angle 
 
-    def gen_device(init_angle=0, noise=0, speed=0):
+    def gen_device(self, init_angle=0, noise=0, speed=0):
         """general device - give init, randomness, turn speed (+/-)"""
-        angle = init_angle
+        # to avoid multiple devs messing with each other
+        self.angle = init_angle
         while True:
-            yield angle
-            angle += (speed + noise * (random.random() - 0.5))
-            angle = angle % (2 * math.pi) 
+            self.angle += (speed + noise * (random.random() - 0.5))
+            self.angle = self.angle % (2 * math.pi) 
+            yield self.angle
