@@ -12,6 +12,7 @@ device_a:
  - noise constant (to add some variance to the calculations)
  - turn speed (in radians per time step, with positive speeds for counterclockwise and negative speeds for clockwise)
  - polling frequency (in Hz)
+ 
 Then the same 7 arguments but for device_b.
 Lastly the experiment parameters:
  - The monitor frequency (in Hz)
