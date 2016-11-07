@@ -13,11 +13,11 @@ device_a
  - turn speed (in radians per time step, with positive speeds for counterclockwise and negative speeds for clockwise)
  - polling frequency (in Hz)
  
- Then the same 7 arguments but for device_b 
+Then the same 7 arguments but for device_b 
  
- Lastly the experiment parameters
-  - The monitor frequency (in Hz)
-  - number of time steps to display (just for the experiment)
+Lastly the experiment parameters
+ - The monitor frequency (in Hz)
+ - number of time steps to display (just for the experiment)
   
 In total there are 16 parameters (7 per device, 2 for environment). A screenshot is included demonstrating this intermediate product.
 
