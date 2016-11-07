@@ -1,62 +1,20 @@
 from ray import Ray
 from device import Device
 import utils 
+import argparse
 
 
-def build_device():
+def build_device(init_angle, noise, speed, freq, name):
     """based on user's input, initialize a device object"""
-
-    # get the user's input
-    device_name = input("Enter the name of the device: ")
-
-    # try to parse immediately so the user can try again
-    origin_str = input(("Enter " + device_name + 
-                        "'s location (ex: (1, 2)): "))
-    origin = parse_origin_str(origin_str)
-
-    init_angle = input(("Enter " + device_name + 
-                        "'s initial angle in radians (ex: 0.0): "))
-    noise = input(("Enter " + device_name + 
-                   "'s noise constant (ex: 0.5): "))
-    speed = input(("Enter " + device_name + 
-                   "'s rotational speed (ex: 2.0): "))
-    hz = input(("Enter " + device_name + 
-                "'s frequency in hz (ex: 60.0): "))
-
-    Device_A = Device(float(init_angle), float(noise), float(speed), 
-            float(hz), device_name)
-    return (origin_str, Device_A)
+    return Device(init_angle, noise, speed, freq, name)
 
 
-def parse_origin_str(origin_str):
-    """take a string like "(1, 2)" and return 1 and 2 as a tuple"""
-    origin_str = origin_str[1:len(origin_str)-1]
-    for i in range(len(origin_str)):
-        if origin_str[i] == ",":
-            return (float(origin_str[:i]), float(origin_str[(i+1):]))
-    # if there was no comma, something bad happened
-    raise NameError('Could not parse device location')
-
-
-def gather_info():    
-    """ask the user for the information on the setup"""
-
-    print("\nEnter information for the first device")
-    origin_str_a, device_a = build_device()
-    origin_a = parse_origin_str(origin_str_a)
-
-    print("\nEnter information for the second device")
-    origin_str_b, device_b = build_device()
-    origin_b = parse_origin_str(origin_str_b)
-
-    monitor_str = input("\nEnter monitor's frequency in hz (ex: 75.0): ")
-    monitor_freq = float(monitor_str)
-
-    return (origin_a, device_a, origin_b, device_b, monitor_freq)
-
-
-def run(count, origin_a, device_a, origin_b, device_b, monitor_freq):
+def run(count, device_a, a_x, a_y, device_b, b_x, b_y, monitor_freq):
     """given the setup parameters - run trials (print outs for now)"""
+    print(("\nFirst Ray, Degree    ||| Second Ray, Degree   |||" + 
+           " Intersection Points"))
+    origin_a = (a_x, a_y)
+    origin_b = (b_x, b_y)
     c, time = 0, 0
     monitor_time_step = 1 / monitor_freq
     while c < count:
@@ -69,7 +27,42 @@ def run(count, origin_a, device_a, origin_b, device_b, monitor_freq):
 
 
 if __name__=="__main__":
-    params = gather_info() 
-    print(("\nFirst Ray, Degree    ||| Second Ray, Degree   |||" + 
-           " Intersection Points"))
-    run(40, params[0], params[1], params[2], params[3], params[4])
+
+    # parse the command line arguments with argparse
+    parser = argparse.ArgumentParser()
+    p = parser
+    p.aa = parser.add_argument
+
+    # device_a content
+    p.aa("device_a", help="name of first device")
+    p.aa("device_a_x", help="x coordinate of first device", type=float)
+    p.aa("device_a_y", help="y coordinate of first device", type=float)
+    p.aa("device_a_angle", help="initial angle of first device", type=float)
+    p.aa("device_a_noise", help="noise constant of first device", type=float)
+    p.aa("device_a_speed", help="turn speed of first device", type=float)
+    p.aa("device_a_freq", help="poll frequency of first device", type=float)
+
+    # device_b content
+    p.aa("device_b", help="name of second device")
+    p.aa("device_b_x", help="x coordinate of second device", type=float)
+    p.aa("device_b_y", help="y coordinate of second device", type=float)
+    p.aa("device_b_angle", help="initial angle of second device", type=float)
+    p.aa("device_b_noise", help="noise constant of second device", type=float)
+    p.aa("device_b_speed", help="turn speed of second device", type=float)
+    p.aa("device_b_freq", help="poll frequency of second device", type=float)
+
+    # experiment content
+    p.aa("monitor_freq", help="monitor frequency in hz", type=float)
+    p.aa("time_steps", help="number of times monitor captures", type=float)
+
+    # based on the input - construct the two devices
+    args = parser.parse_args()
+    Device_A = build_device(args.device_a_angle, args.device_a_noise, 
+            args.device_a_speed, args.device_a_freq, args.device_a)
+    Device_B = build_device(args.device_b_angle, args.device_b_noise, 
+            args.device_b_speed, args.device_b_freq, args.device_b)
+    
+    # run experiment at the monitor frequency (ex: 40 time steps)
+    run(args.time_steps, Device_A, args.device_a_x, args.device_a_y, 
+            Device_B, args.device_b_x, args.device_b_y, args.monitor_freq)
+
